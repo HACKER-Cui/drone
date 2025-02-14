@@ -138,6 +138,8 @@ void aruco_pos_cb(const boost::shared_ptr<const ar_track_alvar_msgs::AlvarMarker
     rotation_matrix_ca = q_ca.toRotationMatrix();
     Tca.linear() = rotation_matrix_ca;  // 获得旋转矩阵
     Tca.translation() = t_ca;           // 平移矩阵 Tca 为变换矩阵
+	ROS_INFO("x,%f,y,%f,z,%f",t_ca[0],t_ca[1],t_ca[2]);
+	
 }
 
 void detceter_cb(const std_msgs::Bool Reached)
