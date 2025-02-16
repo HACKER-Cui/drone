@@ -10,6 +10,7 @@
 #include <ros/duration.h>
 #include <std_msgs/Bool.h>
 #include <cmath>
+#include <ar_track_alvar_msgs/AlvarMarkers.h>
 #include <ar_track_alvar_msgs/AlvarMarker.h>
 #define PI 3.14159265358979323846
 using namespace Eigen;
@@ -130,11 +131,21 @@ void pos_cb(const geometry_msgs::PoseStamped::ConstPtr &msg)
     Twb.linear() = rotation_matrix_wb;
     Twb.translation() = t_wb;
 }
-void aruco_pos_cb(const boost::shared_ptr<const ar_track_alvar_msgs::AlvarMarker>& msg)
+void aruco_pos_cb(const ar_track_alvar_msgs::AlvarMarkers::ConstPtr &msg)
 {
     ROS_INFO("detected");
-    t_ca << msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z;
-    q_ca = Eigen::Quaterniond(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
+    if(!msg->markers.empty()) {
+        const auto& first_marker = msg->markers[0];
+        t_ca << first_marker.pose.pose.position.x, 
+               first_marker.pose.pose.position.y, 
+               first_marker.pose.pose.position.z;
+        q_ca = Eigen::Quaterniond(
+            first_marker.pose.pose.orientation.w,
+            first_marker.pose.pose.orientation.x,
+            first_marker.pose.pose.orientation.y,
+            first_marker.pose.pose.orientation.z
+        );
+    }
     rotation_matrix_ca = q_ca.toRotationMatrix();
     Tca.linear() = rotation_matrix_ca;  // 获得旋转矩阵
     Tca.translation() = t_ca;           // 平移矩阵 Tca 为变换矩阵
@@ -161,7 +172,7 @@ int main(int argc, char** argv)
 	initialize_local_frame();
 	Initialize();
 	APMLanding APMLand;
-	ros::Subscriber aruco_pose_sub = gnc_node.subscribe<ar_track_alvar_msgs::AlvarMarker>("/ar_pose_marker", 10, aruco_pos_cb);
+	ros::Subscriber aruco_pose_sub = gnc_node.subscribe<ar_track_alvar_msgs::AlvarMarkers>("/ar_pose_marker", 10, aruco_pos_cb);
 	ros::Subscriber position_sub = gnc_node.subscribe<geometry_msgs::PoseStamped>("/mavros/local_position/pose", 10, pos_cb);  
 	APMLand.mavros_setpoint_pos_pub_ = gnc_node.advertise<mavros_msgs::PositionTarget>("/mavros/setpoint_raw/local", 10);
 	ros::Subscriber detceter = gnc_node.subscribe<std_msgs::Bool>("/ifdetected",10,detceter_cb);
@@ -175,10 +186,10 @@ int main(int argc, char** argv)
       //{30.51935833,120.72055278}, // 礼堂前坐标
 	  //{30.51905833,120.72055278},
       //{30.51855833,120.72055278}
-	{30.515655385589184, 120.72327045264397},
-	{30.515664119477574, 120.72307782847273},
-	{30.515291472875443, 120.72305755224416},
-	{30.515274005030925, 120.7233008669868}
+		{30.515655385589184, 120.72327045264397},
+		{30.515664119477574, 120.72307782847273},
+		{30.515291472875443, 120.72305755224416},
+		{30.515274005030925, 120.7233008669868}
       //{30.51823611,120.72053888}, // 中间坐标
       //{30.51761963,120.72053888}, // 学院楼前坐标
      // {30.88115641,121.90103634 }, // Waypoint 4
