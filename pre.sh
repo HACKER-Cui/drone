@@ -2,6 +2,7 @@
 cd catkin_ws
 source ~/.bashrc
 echo "source enviroment"
+sudo chmod 777 /dev/ttyACM0
 cd
 #rosrun mavros mavsys rate --all 10
 gnome-terminal --window -e 'bash -c "roslaunch mavros apm.launch;exec bash"' \
