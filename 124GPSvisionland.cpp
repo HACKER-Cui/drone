@@ -243,8 +243,19 @@ int main(int argc, char** argv)
 					if(count3>7){
 						count3=0;
 					}
+				
 				desire_xyVel_[1] = desire_vel_[0];//机体坐标和相机坐标xy相反
+				if (desire_xyVel_[1]>1){
+					desire_xyVel_[1]=1;
+				}else if (desire_xyVel_[1]<-1){
+					desire_xyVel_[1]=-1;
+				} 
 				desire_xyVel_[0] = desire_vel_[1];
+				if (desire_xyVel_[0]>1){
+					desire_xyVel_[0]=1;
+				}else if (desire_xyVel_[1]<-1){
+					desire_xyVel_[0]=-1;
+				}
 				desire_xyVel_[2] = desire_vel_[2];
 				desire_yawVel_ = desire_vel_[3];
 				APMLand.send_body_velxyz_setpoint(desire_xyVel_,desire_yawVel_);
