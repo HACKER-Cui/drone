@@ -2,7 +2,7 @@
 cd catkin_ws
 source ~/.bashrc
 echo "source enviroment"
-sudo chmod 777 /dev/ttyACM0
+sudo chmod 777 /dev/ttyUSB0
 cd
 
 gnome-terminal --window -e 'bash -c "roslaunch mavros apm.launch;exec bash"' \
